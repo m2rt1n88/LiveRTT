@@ -1,0 +1,54 @@
+{
+  "schema_version": "livertt.motor-proposal/0.1",
+  "proposal_id": "demo-proposal-001",
+  "submission_key": "demo-submission-001",
+  "synthetic": true,
+  "created_at": "2026-11-15T12:01:00Z",
+  "expires_at": "2026-11-15T12:11:00Z",
+  "note": "候选变化仅展示 diff / 校验格式，数据不支持该变化，不是调参建议。",
+  "based_on": {
+    "trial_ids": ["demo-trial-001"],
+    "snapshot_id": "demo-end",
+    "session_id": "demo-session",
+    "motor_id": "demo-motor",
+    "object_incarnation": "demo-incarnation-1",
+    "elf_sha256": null,
+    "capability_revision": "demo-cap-1",
+    "config_revision": "demo-config-2",
+    "motor_mode_bits": 2
+  },
+  "changes": [
+    {
+      "parameter_id": "dji.velocity_pid.kp",
+      "expected_before": 4.0,
+      "candidate_after": 4.5,
+      "unit": "raw/(rad/s)",
+      "reason": "格式示例：展示旧值与候选值；没有足够证据支持应用。",
+      "update_policy": "live_scalar_without_reset"
+    }
+  ],
+  "evidence": [
+    {
+      "trial_id": "demo-trial-001",
+      "segment_id": "post-input",
+      "sample_indices": [1, 2, 3],
+      "channel_ids": ["target_velocity", "feedback_velocity"],
+      "finding": "目标变化后只有少量合成观测点，其中一个反馈缺失。",
+      "interpretation": "不能据此确定稳态误差或判定应增加 Kp。",
+      "limitations": ["synthetic_only", "insufficient_time_resolution", "unknown_load"]
+    }
+  ],
+  "application_eligibility": {
+    "authority": "synthetic_validator_example",
+    "status": "blocked",
+    "reasons": ["synthetic_input", "no_live_session_binding", "unknown_engineering_bounds", "insufficient_trial_data", "incomplete_configuration_snapshot"]
+  },
+  "next_trial": {
+    "action": "collect_data_only",
+    "description": "确认实际固件、参数更新者、机构约束和负载后，由操作者选择获认可的输入，记录完整基线。",
+    "stimulus": {"kind": "operator_defined", "amplitude": null, "duration_s": null, "repeatable": false},
+    "required_channels": ["actual_target", "velocity_pid_target", "velocity_pid_measure", "velocity_pid_p", "velocity_pid_i", "velocity_pid_d", "velocity_pid_output", "driver_output", "current_a"],
+    "acceptance": {"status": "requires_operator_definition", "performance_thresholds": null},
+    "hardware_execution_authorized": false
+  }
+}

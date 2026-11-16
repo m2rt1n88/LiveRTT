@@ -1,0 +1,1 @@
+{"name":"livertt-embedded-workbench","private":true,"version":"0.2.0","type":"module","scripts":{"test":"node --test tests/frontend.test.js tests/motion-dom.test.js tests/mechanisms.test.js tests/motor-control.test.js tests/motor-ai.test.js tests/motor-plots.test.js"}}

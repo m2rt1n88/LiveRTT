@@ -1,0 +1,7 @@
+.venv/
+.deps/
+__pycache__/
+*.pyc
+data/profiles.json
+data/profiles-*.tmp
+tests/.runtime/

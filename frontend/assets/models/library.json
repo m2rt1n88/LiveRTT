@@ -1,0 +1,666 @@
+{
+  "version": 1,
+  "gimbal": [
+    {
+      "id": "yaw-pitch",
+      "name": "常规 Yaw / Pitch",
+      "adapter": "joint-tree",
+      "joints": [
+        {
+          "id": "yaw",
+          "label": "Yaw",
+          "parent": null,
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "pitch",
+          "label": "Pitch",
+          "parent": "yaw",
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "origin": [
+            0,
+            0,
+            47
+          ]
+        }
+      ],
+      "tool": {
+        "parent": "pitch",
+        "origin": [
+          128,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "dual-yaw",
+      "name": "同轴大小 Yaw / Pitch",
+      "adapter": "joint-tree",
+      "joints": [
+        {
+          "id": "yaw",
+          "label": "大 Yaw",
+          "parent": null,
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "smallYaw",
+          "label": "小 Yaw",
+          "parent": "yaw",
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            30
+          ]
+        },
+        {
+          "id": "pitch",
+          "label": "Pitch",
+          "parent": "smallYaw",
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "origin": [
+            0,
+            0,
+            38
+          ]
+        }
+      ],
+      "tool": {
+        "parent": "pitch",
+        "origin": [
+          128,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "folding",
+      "name": "折叠头 · Yaw / 下 Pitch / 上 Pitch",
+      "adapter": "joint-tree",
+      "joints": [
+        {
+          "id": "yaw",
+          "label": "Yaw",
+          "parent": null,
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "pitch",
+          "label": "下 Pitch（抬升）",
+          "parent": "yaw",
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "origin": [
+            0,
+            0,
+            47
+          ]
+        },
+        {
+          "id": "fold",
+          "label": "上 Pitch（俯仰）",
+          "parent": "pitch",
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "origin": [
+            58,
+            0,
+            0
+          ]
+        }
+      ],
+      "tool": {
+        "parent": "fold",
+        "origin": [
+          90,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "chassis": [
+    {
+      "id": "mecanum",
+      "name": "Mecanum · 麦克纳姆轮",
+      "adapter": "uicrm-four",
+      "factor": 1,
+      "wheels": [
+        {
+          "id": "fl",
+          "label": "左前 FL",
+          "position": [
+            84,
+            108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": 1,
+          "roller": 1
+        },
+        {
+          "id": "fr",
+          "label": "右前 FR",
+          "position": [
+            84,
+            -108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": -1,
+          "roller": -1
+        },
+        {
+          "id": "bl",
+          "label": "左后 BL",
+          "position": [
+            -84,
+            108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": 1,
+          "roller": -1
+        },
+        {
+          "id": "br",
+          "label": "右后 BR",
+          "position": [
+            -84,
+            -108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": -1,
+          "roller": 1
+        }
+      ],
+      "outline": [
+        [
+          -100,
+          -76
+        ],
+        [
+          100,
+          -76
+        ],
+        [
+          100,
+          76
+        ],
+        [
+          -100,
+          76
+        ]
+      ]
+    },
+    {
+      "id": "omni",
+      "name": "OMNI · 四角切向全向轮",
+      "adapter": "uicrm-four",
+      "factor": 0.7071067811865476,
+      "wheels": [
+        {
+          "id": "fl",
+          "label": "左前 FL",
+          "position": [
+            108,
+            98,
+            0
+          ],
+          "angle": -45,
+          "rollingSign": 1,
+          "roller": 0
+        },
+        {
+          "id": "fr",
+          "label": "右前 FR",
+          "position": [
+            108,
+            -98,
+            0
+          ],
+          "angle": 45,
+          "rollingSign": -1,
+          "roller": 0
+        },
+        {
+          "id": "bl",
+          "label": "左后 BL",
+          "position": [
+            -108,
+            98,
+            0
+          ],
+          "angle": 45,
+          "rollingSign": 1,
+          "roller": 0
+        },
+        {
+          "id": "br",
+          "label": "右后 BR",
+          "position": [
+            -108,
+            -98,
+            0
+          ],
+          "angle": -45,
+          "rollingSign": -1,
+          "roller": 0
+        }
+      ],
+      "outline": [
+        [
+          -100,
+          -76
+        ],
+        [
+          100,
+          -76
+        ],
+        [
+          100,
+          76
+        ],
+        [
+          -100,
+          76
+        ]
+      ]
+    },
+    {
+      "id": "differential",
+      "name": "双轮差速（通用模板）",
+      "adapter": "matrix",
+      "components": [
+        "vy",
+        "omega"
+      ],
+      "wheels": [
+        {
+          "id": "left",
+          "label": "左轮",
+          "position": [
+            0,
+            108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": 1,
+          "roller": 0,
+          "drive": [
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "id": "right",
+          "label": "右轮",
+          "position": [
+            0,
+            -108,
+            0
+          ],
+          "angle": 0,
+          "rollingSign": -1,
+          "roller": 0,
+          "drive": [
+            0,
+            -1,
+            1
+          ]
+        }
+      ],
+      "outline": [
+        [
+          -100,
+          -76
+        ],
+        [
+          100,
+          -76
+        ],
+        [
+          100,
+          76
+        ],
+        [
+          -100,
+          76
+        ]
+      ]
+    },
+    {
+      "id": "omni-three",
+      "name": "三轮全向（通用模板）",
+      "adapter": "matrix",
+      "components": [
+        "vx",
+        "vy",
+        "omega"
+      ],
+      "wheels": [
+        {
+          "id": "front",
+          "label": "前轮",
+          "position": [
+            125,
+            0,
+            0
+          ],
+          "angle": 90,
+          "rollingSign": 1,
+          "roller": 0,
+          "drive": [
+            -1,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "bl",
+          "label": "左后 BL",
+          "position": [
+            -62.5,
+            108.25,
+            0
+          ],
+          "angle": -30,
+          "rollingSign": 1,
+          "roller": 0,
+          "drive": [
+            0.5,
+            0.8660254037844386,
+            1
+          ]
+        },
+        {
+          "id": "br",
+          "label": "右后 BR",
+          "position": [
+            -62.5,
+            -108.25,
+            0
+          ],
+          "angle": 30,
+          "rollingSign": -1,
+          "roller": 0,
+          "drive": [
+            0.5,
+            -0.8660254037844386,
+            1
+          ]
+        }
+      ],
+      "outline": [
+        [
+          95,
+          0
+        ],
+        [
+          -48,
+          -78
+        ],
+        [
+          -48,
+          78
+        ]
+      ]
+    }
+  ],
+  "gimbalMigrations": [
+    {
+      "from": {
+        "id": "dual-yaw",
+        "name": "大 Yaw / 小 Yaw / Pitch（通用模板）",
+        "adapter": "joint-tree",
+        "joints": [
+          {
+            "id": "yaw",
+            "label": "大 Yaw",
+            "parent": null,
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "smallYaw",
+            "label": "小 Yaw",
+            "parent": "yaw",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              28,
+              0,
+              30
+            ]
+          },
+          {
+            "id": "pitch",
+            "label": "Pitch",
+            "parent": "smallYaw",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "origin": [
+              0,
+              0,
+              38
+            ]
+          }
+        ],
+        "tool": {
+          "parent": "pitch",
+          "origin": [
+            128,
+            0,
+            0
+          ]
+        }
+      },
+      "to": "dual-yaw"
+    },
+    {
+      "from": {
+        "id": "folding",
+        "name": "Yaw / Pitch / 折叠头（通用串联模板）",
+        "adapter": "joint-tree",
+        "joints": [
+          {
+            "id": "yaw",
+            "label": "Yaw",
+            "parent": null,
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "pitch",
+            "label": "Pitch",
+            "parent": "yaw",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "origin": [
+              0,
+              0,
+              47
+            ]
+          },
+          {
+            "id": "fold",
+            "label": "折叠关节",
+            "parent": "pitch",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "origin": [
+              58,
+              0,
+              0
+            ]
+          }
+        ],
+        "tool": {
+          "parent": "fold",
+          "origin": [
+            90,
+            0,
+            0
+          ]
+        }
+      },
+      "to": "folding"
+    },
+    {
+      "from": {
+        "id": "dual-yaw-folding",
+        "name": "大小 Yaw / Pitch / 折叠头（通用模板）",
+        "adapter": "joint-tree",
+        "joints": [
+          {
+            "id": "yaw",
+            "label": "大 Yaw",
+            "parent": null,
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "smallYaw",
+            "label": "小 Yaw",
+            "parent": "yaw",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              28,
+              0,
+              28
+            ]
+          },
+          {
+            "id": "pitch",
+            "label": "Pitch",
+            "parent": "smallYaw",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "origin": [
+              0,
+              0,
+              38
+            ]
+          },
+          {
+            "id": "fold",
+            "label": "折叠关节",
+            "parent": "pitch",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "origin": [
+              58,
+              0,
+              0
+            ]
+          }
+        ],
+        "tool": {
+          "parent": "fold",
+          "origin": [
+            90,
+            0,
+            0
+          ]
+        }
+      },
+      "to": null
+    }
+  ]
+}

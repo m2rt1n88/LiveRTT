@@ -1,0 +1,215 @@
+{
+  "schema_version": "livertt.motor-trial/0.1",
+  "trial_id": "demo-trial-001",
+  "synthetic": true,
+  "created_at": "2026-11-15T12:00:00Z",
+  "note": "人工合成的格式样例；未连接硬件，数值不是推荐值，禁止绑定实时应用。",
+  "provenance": {
+    "elf_alias": "synthetic-firmware",
+    "elf_sha256": null,
+    "flash_check": {"status": "not_performed", "reason": "synthetic_example"},
+    "firmware_boot_id": null,
+    "source_matches_elf": "unknown",
+    "source_revision": null,
+    "adapter_version": "synthetic-dji/0.1"
+  },
+  "binding": {
+    "session_id": "demo-session",
+    "motor_id": "demo-motor",
+    "object_incarnation": "demo-incarnation-1",
+    "capability_revision": "demo-cap-1",
+    "config_revision": "demo-config-1"
+  },
+  "context": {
+    "family": "DJI",
+    "model": null,
+    "resolved_type": "synthetic DjiMotorBase",
+    "bus": "synthetic CAN1",
+    "rx_id": 513,
+    "tx_id": 512,
+    "mechanism": "synthetic output shaft",
+    "coordinate_frame": "demo-output-shaft",
+    "angle_unit": "rad",
+    "speed_unit": "rad/s",
+    "positive_direction": "synthetic convention only",
+    "gear_ratio": null,
+    "zero_offset": null,
+    "load": {"status": "unknown", "description": null},
+    "supply_voltage_v": null,
+    "initial_temperature_c": null
+  },
+  "objective": {
+    "loop": "velocity",
+    "description": "示范如何记录速度目标变化；数据不足以优化。",
+    "allowed_parameters": ["dji.velocity_pid.kp"],
+    "engineering_bounds": {
+      "dji.velocity_pid.kp": {"min": null, "max": null, "source": "unknown"}
+    },
+    "performance_acceptance": null,
+    "protection_constraints": {"status": "not_established", "values": []},
+    "readiness": "blocked"
+  },
+  "parameter_snapshots": [
+    {
+      "snapshot_id": "demo-start",
+      "phase": "start",
+      "config_revision": "demo-config-1",
+      "host_read_window_s": [-0.04, -0.01],
+      "atomic": false,
+      "complete": false,
+      "expected_parameters": [
+        "dji.velocity_pid.kp", "dji.velocity_pid.ki", "dji.velocity_pid.kd",
+        "dji.velocity_pid.max_output", "dji.velocity_pid.max_integral", "dji.velocity_pid.deadband",
+        "dji.velocity_pid.output_filter.alpha", "dji.velocity_pid.derivative_filter.alpha",
+        "dji.velocity_pid.mode_bits", "dji.velocity_pid.integral_rate.a", "dji.velocity_pid.integral_rate.b",
+        "dji.angle_pid.kp", "dji.angle_pid.ki", "dji.angle_pid.kd",
+        "dji.angle_pid.max_output", "dji.angle_pid.max_integral", "dji.angle_pid.deadband",
+        "dji.angle_pid.output_filter.alpha", "dji.angle_pid.derivative_filter.alpha",
+        "dji.angle_pid.mode_bits", "dji.angle_pid.integral_rate.a", "dji.angle_pid.integral_rate.b",
+        "dji.motor.mode_bits", "dji.motor.absolute_mode", "dji.motor.enabled",
+        "dji.motor.target", "dji.motor.speed_feedforward", "dji.motor.current_feedforward",
+        "dji.feedback.speed_filter.alpha"
+      ],
+      "values": {
+        "dji.velocity_pid.kp": 4.0,
+        "dji.velocity_pid.ki": 0.0,
+        "dji.velocity_pid.kd": 0.0,
+        "dji.velocity_pid.max_output": 100.0,
+        "dji.velocity_pid.max_integral": 20.0,
+        "dji.velocity_pid.deadband": 0.0,
+        "dji.velocity_pid.output_filter.alpha": 1.0,
+        "dji.velocity_pid.derivative_filter.alpha": 1.0,
+        "dji.velocity_pid.mode_bits": 1,
+        "dji.velocity_pid.integral_rate.a": 1.0,
+        "dji.velocity_pid.integral_rate.b": 0.0,
+        "dji.angle_pid.kp": 2.0,
+        "dji.angle_pid.ki": 0.0,
+        "dji.angle_pid.kd": 0.0,
+        "dji.angle_pid.max_output": 3.0,
+        "dji.angle_pid.max_integral": 1.0,
+        "dji.angle_pid.deadband": 0.0,
+        "dji.angle_pid.output_filter.alpha": 1.0,
+        "dji.angle_pid.derivative_filter.alpha": 1.0,
+        "dji.angle_pid.mode_bits": 1,
+        "dji.angle_pid.integral_rate.a": 1.0,
+        "dji.angle_pid.integral_rate.b": 0.0,
+        "dji.motor.mode_bits": 2,
+        "dji.motor.absolute_mode": false,
+        "dji.motor.enabled": true,
+        "dji.motor.target": 0.0,
+        "dji.motor.speed_feedforward": 0.0,
+        "dji.motor.current_feedforward": 0.0,
+        "dji.feedback.speed_filter.alpha": null
+      },
+      "missing_parameters": [{"parameter_id": "dji.feedback.speed_filter.alpha", "reason": "derived_type_unresolved"}],
+      "field_errors": {},
+      "activation": {
+        "velocity_loop": {"enabled": true, "effective": true},
+        "angle_loop": {"enabled": false, "effective": false},
+        "velocity_output_filter": {"enabled": false, "effective": false},
+        "velocity_derivative_filter": {"enabled": false, "effective": false}
+      },
+      "ownership": {
+        "target": "synthetic_operator",
+        "pid_parameters": "unknown",
+        "feedforward": "unknown"
+      },
+      "state_policy": "no_reset_observed"
+    },
+    {
+      "snapshot_id": "demo-end",
+      "phase": "end",
+      "config_revision": "demo-config-2",
+      "host_read_window_s": [0.16, 0.19],
+      "atomic": false,
+      "complete": false,
+      "expected_parameters_same_as": "demo-start",
+      "values": {
+        "dji.velocity_pid.kp": 4.0,
+        "dji.velocity_pid.ki": 0.0,
+        "dji.velocity_pid.kd": 0.0,
+        "dji.velocity_pid.max_output": 100.0,
+        "dji.velocity_pid.max_integral": 20.0,
+        "dji.velocity_pid.deadband": 0.0,
+        "dji.velocity_pid.output_filter.alpha": 1.0,
+        "dji.velocity_pid.derivative_filter.alpha": 1.0,
+        "dji.velocity_pid.mode_bits": 1,
+        "dji.velocity_pid.integral_rate.a": 1.0,
+        "dji.velocity_pid.integral_rate.b": 0.0,
+        "dji.angle_pid.kp": 2.0,
+        "dji.angle_pid.ki": 0.0,
+        "dji.angle_pid.kd": 0.0,
+        "dji.angle_pid.max_output": 3.0,
+        "dji.angle_pid.max_integral": 1.0,
+        "dji.angle_pid.deadband": 0.0,
+        "dji.angle_pid.output_filter.alpha": 1.0,
+        "dji.angle_pid.derivative_filter.alpha": 1.0,
+        "dji.angle_pid.mode_bits": 1,
+        "dji.angle_pid.integral_rate.a": 1.0,
+        "dji.angle_pid.integral_rate.b": 0.0,
+        "dji.motor.mode_bits": 2,
+        "dji.motor.absolute_mode": false,
+        "dji.motor.enabled": true,
+        "dji.motor.target": 1.0,
+        "dji.motor.speed_feedforward": 0.0,
+        "dji.motor.current_feedforward": 0.0,
+        "dji.feedback.speed_filter.alpha": null
+      },
+      "missing_parameters": [{"parameter_id": "dji.feedback.speed_filter.alpha", "reason": "derived_type_unresolved"}],
+      "field_errors": {},
+      "activation_same_as": "demo-start",
+      "ownership_same_as": "demo-start",
+      "state_policy": "no_reset_observed"
+    }
+  ],
+  "stimulus": {
+    "kind": "manual_target_change",
+    "requested": {"channel_id": "target_velocity", "before": 0.0, "after": 1.0, "host_request_window_s": [0.02, 0.04]},
+    "observed": {"first_changed_sample": 1, "actual_firmware_start_s": null, "firmware_ack": null},
+    "repeatable": false
+  },
+  "time_definition": {
+    "basis": "host_monotonic_read_window",
+    "origin": "synthetic_trial_origin",
+    "unit": "s",
+    "firmware_time_available": false,
+    "per_field_time_available": false
+  },
+  "channels": [
+    {"channel_id": "target_velocity", "unit": "rad/s", "frame": "demo-output-shaft", "source_kind": "swd_field", "source_field": "state_.target", "condition": "OMEGA without CURRENT or THETA", "synthetic": true},
+    {"channel_id": "feedback_velocity", "unit": "rad/s", "frame": "demo-output-shaft", "source_kind": "swd_field", "source_field": "state_.output_shaft_omega", "filter_state": "unknown", "synthetic": true},
+    {"channel_id": "driver_output", "unit": "raw", "source_kind": "swd_field", "source_field": "output_", "synthetic": true}
+  ],
+  "segments": [
+    {"segment_id": "pre-input", "sample_indices": [0], "config_revision": "demo-config-1"},
+    {"segment_id": "post-input", "sample_indices": [1, 2, 3], "config_revision": "demo-config-2"}
+  ],
+  "samples": [
+    {"index": 0, "segment_id": "pre-input", "host_read_window_s": [0.0, 0.01], "firmware_tick": null, "values": {"target_velocity": 0.0, "feedback_velocity": 0.0, "driver_output": 0}, "channel_errors": {}},
+    {"index": 1, "segment_id": "post-input", "host_read_window_s": [0.05, 0.06], "firmware_tick": null, "values": {"target_velocity": 1.0, "feedback_velocity": 0.25, "driver_output": 3}, "channel_errors": {}},
+    {"index": 2, "segment_id": "post-input", "host_read_window_s": [0.1, 0.11], "firmware_tick": null, "values": {"target_velocity": 1.0, "feedback_velocity": null, "driver_output": 2}, "channel_errors": {"feedback_velocity": "synthetic_read_failure"}},
+    {"index": 3, "segment_id": "post-input", "host_read_window_s": [0.15, 0.16], "firmware_tick": null, "values": {"target_velocity": 1.0, "feedback_velocity": 0.5, "driver_output": 2}, "channel_errors": {}}
+  ],
+  "events": [
+    {"type": "target_change", "source": "operator", "host_window_s": [0.02, 0.06], "before": 0.0, "after": 1.0, "parameter_id": "dji.motor.target", "from_revision": "demo-config-1", "to_revision": "demo-config-2", "synthetic": true}
+  ],
+  "quality": {
+    "status": "insufficient_for_dynamic_tuning",
+    "requested_hz": 20.0,
+    "observed_host_batch_hz": 20.0,
+    "interval_s": {"min": 0.05, "median": 0.05, "max": 0.05},
+    "max_feedback_gap_s": 0.1,
+    "batch_duration_s": {"min": 0.01, "max": 0.01},
+    "missing_fraction": {"target_velocity": 0.0, "feedback_velocity": 0.25, "driver_output": 0.0},
+    "dropped_firmware_samples": null,
+    "atomic": false,
+    "synchronization": "none",
+    "decimation": {"method": "none", "original_count": 4, "retained_count": 4},
+    "missing_required_channels": ["velocity_pid_target", "velocity_pid_measure", "velocity_pid_p", "velocity_pid_i", "velocity_pid_d", "velocity_pid_output", "current_a"],
+    "limitations": ["synthetic_only", "no_firmware_time_or_sequence", "no_settled_window", "unknown_load_and_engineering_bounds", "incomplete_parameter_snapshot"]
+  },
+  "metrics": [
+    {"metric_id": "overshoot", "method_version": "eligibility-only/0.1", "segment_id": "post-input", "unit": "rad/s", "status": "insufficient_data", "value": null, "reason": "采样覆盖和输入时刻不足，不能确定峰值或终值。"},
+    {"metric_id": "settling_time", "method_version": "eligibility-only/0.1", "segment_id": "post-input", "unit": "s", "status": "insufficient_data", "value": null, "reason": "没有有效驻留窗口和认可的容差。"}
+  ]
+}

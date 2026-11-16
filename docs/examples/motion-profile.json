@@ -1,0 +1,77 @@
+{
+  "version": 2,
+  "name": "待配置的 ELF",
+  "elfPath": "C:/path/to/firmware.elf",
+  "connection": {
+    "autoStart": true,
+    "executable": "",
+    "config": "",
+    "port": 6666,
+    "rttPort": 8888
+  },
+  "rate": 10,
+  "window": "30",
+  "watches": [],
+  "modules": {
+    "vehicle": {
+      "enabled": false,
+      "bindings": {"headingTarget": ""},
+      "angleUnit": "rad",
+      "gimbalFrame": "body"
+    },
+    "motors": {
+      "enabled": false,
+      "bindings": {"angle": "", "speed": "", "current": "", "temperature": ""},
+      "selected": [],
+      "focus": "",
+      "bus": ""
+    },
+    "gimbal": {
+      "enabled": false,
+      "bindings": {
+        "yaw": "",
+        "yawTarget": "",
+        "pitch": "",
+        "pitchTarget": "",
+        "yawSpeed": "",
+        "pitchSpeed": "",
+        "enabled": "",
+        "mode": ""
+      },
+      "angleUnit": "rad",
+      "yawWrap": true,
+      "tolerance": 3,
+      "axes": {
+        "yaw": {"motor": "", "sign": 1, "ratio": 1, "zero": 0, "min": -180, "max": 180},
+        "pitch": {"motor": "", "sign": 1, "ratio": 1, "zero": 0, "min": -30, "max": 30}
+      }
+    },
+    "chassis": {
+      "enabled": false,
+      "bindings": {
+        "vx": "",
+        "vy": "",
+        "omega": "",
+        "heading": "",
+        "vxTarget": "",
+        "vyTarget": "",
+        "omegaTarget": "",
+        "enabled": ""
+      },
+      "angleUnit": "rad",
+      "layout": "mecanum",
+      "radius": 0.076,
+      "halfLength": 0.2,
+      "halfWidth": 0.2,
+      "vectorScale": 2,
+      "offset": 0,
+      "commandUnits": "si",
+      "wheels": {
+        "fl": {"motor": "", "sign": 1, "ratio": 1},
+        "fr": {"motor": "", "sign": 1, "ratio": 1},
+        "bl": {"motor": "", "sign": 1, "ratio": 1},
+        "br": {"motor": "", "sign": 1, "ratio": 1}
+      }
+    }
+  }
+}

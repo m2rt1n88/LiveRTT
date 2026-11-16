@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f6f5"><meta name="description" content="通过 ELF、SWD 和 RTT 调试嵌入式程序"><title>LiveRTT · 嵌入式调试工作台</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23287963'/%3E%3Cpath d='M8 23h7l4-12 4 18 4-12h5' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E"><link rel="stylesheet" href="/assets/css/app.css"><script type="module" src="/assets/js/app.js"></script></head>
+<body>
+<aside class="sidebar">
+ <a class="brand" href="#workspace"><span class="brand-mark">∿</span><span>LiveRTT<small>EMBEDDED WORKBENCH</small></span></a>
+ <div class="workspace-card"><span class="chip-icon">▦</span><div><strong id="active-profile">本地工作空间</strong><small id="active-elf">选择 ELF 开始调试</small></div></div>
+ <p class="nav-label">调试工作空间</p><nav aria-label="工作空间导航">
+  <button class="nav-item active" data-page="workspace"><span class="nav-icon">▦</span>工作空间<span class="key-hint">1</span></button>
+  <button class="nav-item" data-page="curves"><span class="nav-icon">∿</span>数据曲线<span class="key-hint">2</span></button>
+  <div id="module-nav"></div>
+ </nav>
+ <div class="sidebar-foot"><span class="connection-light" id="sidebar-light"></span><span id="sidebar-state">本地服务连接中</span><small>SWD + RTT · LOCAL ONLY</small></div>
+</aside>
+<div class="main-shell">
+ <header class="topbar"><div class="breadcrumbs">工作空间 <span>/</span> <strong id="breadcrumb">ELF 与变量</strong></div><div class="top-status"><span id="save-status" role="status">配置未加载</span><span class="status-pill" id="connection-status">硬件未连接</span><button class="icon-button" id="help" aria-label="使用说明">?</button></div></header>
+ <main>
+  <div class="page-heading"><div><div class="eyebrow">EMBEDDED DEVELOPMENT</div><h1 id="page-title">从变量开始，理解你的程序。</h1><p id="page-description">选择 ELF，观察真实变量。每个程序都有自己的调试配置。</p></div><span class="read-only-tag">实时观察 · 电机调参</span></div>
+  <div class="session-bar"><div><span class="connection-light" id="stream-light"></span><strong id="session-status">等待加载 ELF</strong><span id="sample-meta">变量与曲线共用同一采集会话</span></div><div class="session-actions"><label>采样<select id="sample-rate" aria-label="采样频率"><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select></label><button class="button primary" id="sample-toggle" disabled>开始采集</button></div></div>
+  <div class="notice" id="notice" role="status" hidden></div>
+
+  <section id="workspace-page" class="page">
+   <article class="panel setup-panel"><div class="panel-heading"><div><span class="step">01</span><h2>程序与连接</h2></div><span class="caption">ELF 调试信息 → SWD 变量 → RTT 日志</span></div><div class="panel-body">
+    <div class="profile-grid"><label>已保存的调试配置<select id="profile-select" aria-label="已保存的调试配置"><option value="">选择 ELF 的上次配置</option></select></label><label>配置名称<input id="profile-name" placeholder="加载 ELF 后可自定义名称" maxlength="100" disabled></label><div class="profile-actions"><button class="button" id="save-profile" disabled>保存配置</button><button class="button subtle" id="export-profile" disabled>导出</button><label class="button subtle file-button">导入<input type="file" id="import-profile" accept=".json,application/json" hidden></label></div></div>
+    <label class="field-label" for="elf-path">ELF 文件路径</label><div class="path-row"><input id="elf-path" list="elf-candidates" placeholder="填写任意例程 / program 的 ELF 完整路径" spellcheck="false"><datalist id="elf-candidates"></datalist><button class="button primary" id="load-elf">加载 / 切换 ELF</button></div><p id="elf-meta" class="hint">支持带 DWARF 调试信息的 32 位 ARM ELF。可离线浏览，无需先连接板子。</p>
+    <div class="connection-row"><label class="check"><input type="checkbox" id="firmware-confirm">ELF 与板上固件来自同一次构建</label><button class="button primary" id="connect" disabled>一键连接 SWD + RTT</button><button class="button" id="disconnect" disabled>断开</button></div>
+    <details class="advanced"><summary>连接设置 <span>调试器、配置文件与端口 · 随 ELF 保存</span></summary><div class="connection-grid"><label>OpenOCD 程序<input id="openocd-executable" placeholder="自动查找 openocd.exe" spellcheck="false"></label><label>OpenOCD 配置文件<input id="openocd-config" placeholder="选择与你的板子和探针对应的 .cfg" spellcheck="false"></label><label>Tcl 端口<input id="tcl-port" type="number" min="1" max="65535" value="6666"></label><label>RTT 端口<input id="rtt-port" type="number" min="1" max="65535" value="8888"></label></div><label class="check"><input type="checkbox" id="auto-start" checked>未运行时自动后台启动 OpenOCD；已有服务直接复用</label><p class="hint">默认沿用当前 CMSIS-DAP / STM32F4 配置。切换板子时请修改 .cfg；内存读取目前支持 STM32F4 SRAM / CCM。</p></details>
+   </div></article>
+
+   <div class="variables-grid"><article class="panel browser-panel"><div class="panel-heading"><div><span class="step">02</span><h2>变量浏览器</h2></div><span class="caption" id="variable-count">等待 ELF</span></div><div class="panel-body"><input id="variable-search" type="search" aria-label="搜索 ELF 变量" placeholder="搜索全局 / 静态变量" disabled><div id="variable-tree" class="variable-tree"><div class="empty">加载 ELF 后，展开对象并添加需要观察的数值字段。</div></div><button class="text-button" id="more-variables" hidden>加载更多变量</button><label class="field-label" for="variable-expression">直接添加变量路径</label><div class="path-row"><input id="variable-expression" placeholder="例如 motor1->state_.omega" spellcheck="false"><button class="button" id="add-variable" disabled>添加</button></div><p class="hint">展开结构体、指针和继承字段；不执行函数或赋值。</p></div></article>
+    <article class="panel watch-panel"><div class="panel-heading"><div><span class="step">03</span><h2>已选变量</h2><span class="count" id="watch-count">0 / 16</span></div><button class="text-button" data-go="curves">去画曲线 ↗</button></div><div class="table-scroll"><table><thead><tr><th>变量 / 类型</th><th>当前值</th><th>显示名称</th><th>单位</th><th>倍率</th><th>状态</th><th>曲线</th><th></th></tr></thead><tbody id="watch-table"></tbody></table></div><div class="panel-foot">数值实时更新；暂停后显示历史值。角度 rad → deg：倍率 57.2957795，单位 deg。</div></article></div>
+
+   <article class="panel rtt-panel"><div class="panel-heading"><div><span class="step">04</span><h2>RTT 日志</h2><span class="caption" id="rtt-status">等待连接</span></div><div class="inline-actions"><button class="text-button" id="rtt-follow" aria-pressed="true">自动滚动：开</button><button class="text-button" id="export-rtt">导出日志</button><button class="text-button" id="clear-rtt">清空</button></div></div><pre class="rtt-log" id="rtt-log" aria-label="RTT 上行日志">固件已有的 RTT 输出会出现在这里。变量采集不依赖 print。</pre><div class="panel-foot">RTT 上行通道 0 · 保留最近 1,500 行</div></article>
+  </section>
+
+  <section id="curves-page" class="page" hidden>
+   <div class="curve-layout"><article class="panel channel-panel"><div class="panel-heading"><div><h2>曲线变量</h2><span class="count" id="plotted-count">0</span></div><button class="text-button" id="plot-all">全选</button></div><div class="panel-body"><p class="hint">从工作空间的已选变量中选择要绘制的通道。</p><div id="curve-channels"></div><button class="button full-width" data-go="workspace">＋ 回到工作空间添加变量</button></div></article>
+    <article class="panel chart-panel"><div class="panel-heading"><div><h2>变量实时曲线</h2><span class="caption" id="chart-caption">等待真实硬件数据</span></div><label class="inline-field">时间窗口<select id="chart-window" aria-label="曲线时间窗口"><option value="10">最近 10 s</option><option value="30" selected>最近 30 s</option><option value="120">最近 120 s</option><option value="all">全部历史</option></select></label></div><div class="legend" id="chart-legend"></div><div class="chart-wrap"><canvas id="variable-chart" role="img" aria-label="真实变量曲线"></canvas><div class="chart-empty" id="chart-empty">先添加变量并开始采集</div><div class="chart-tooltip" id="chart-tooltip" hidden></div></div><div class="chart-footer"><span id="chart-meta">保留最近 10 分钟，最多 12,000 帧</span><div><button class="text-button" id="export-csv">导出 CSV</button><button class="text-button" id="clear-samples">清空历史</button></div></div><p class="hint chart-note">不同单位独立纵轴。电脑轮询采样，不保证控制周期同步；CSV 保留原始数值与显示值。</p></article></div>
+   <article class="panel"><div class="panel-heading"><div><h2>通道读数</h2><span class="caption">与工作空间使用同一批真实采样</span></div></div><div id="curve-readings" class="reading-grid"></div></article>
+  </section>
+
+  <section id="monitor-page" class="page" hidden>
+   <article class="panel monitor-setup"><div class="panel-heading"><div><h2>模块设置</h2><span id="monitor-state" class="count">未启用</span></div><label class="module-toggle"><span id="monitor-enable-label">启用监视</span><input id="monitor-enabled" type="checkbox" role="switch" aria-label="启用监视"><span class="toggle-track" aria-hidden="true"></span></label></div>
+    <div class="panel-body"><p id="monitor-hint" class="hint"></p><details id="monitor-settings" hidden><summary>自定义变量绑定（可选，覆盖电机反馈 / 目标）</summary><div id="monitor-bindings" class="module-fields"></div><label class="field-label" for="monitor-variable">添加可绑定的变量</label><div class="path-row"><input id="monitor-variable" placeholder="填写当前 ELF 的变量路径" spellcheck="false"><button id="monitor-add-variable" class="button">添加监视变量</button></div><p class="hint">可直接在这里添加变量，再为各项指标选择绑定。开关与绑定按当前 ELF 自动保存。角度 / 角速度使用变量单位；速度绑定需换算为 m/s，角速度为 rad/s 或 deg/s。</p></details></div>
+   </article>
+   <article id="monitor-disabled" class="panel monitor-disabled"><span class="monitor-off-icon" aria-hidden="true">○</span><h2>此监视模块尚未启用</h2><p>打开上方开关后，再配置变量绑定并查看监视数据。</p></article>
+   <div id="motion-dashboard" hidden></div>
+   <div id="motor-dashboard" hidden></div>
+  </section>
+  <footer>LiveRTT <span>让调试回到程序本身。</span><span>配置存于本机 · 无需新增固件打印</span></footer>
+ </main>
+</div>
+<dialog id="help-dialog"><form method="dialog" class="dialog-heading"><h2>从 ELF 到实时数据</h2><button class="icon-button" aria-label="关闭说明">×</button></form><div class="dialog-content"><ol><li>填写 ELF 路径或选择已保存配置。重新编译同一路径后，变量路径会重新解析。</li><li>展开变量并添加数值字段；在第一页面查看读数，在「数据曲线」选择绘图通道。</li><li>核对连接配置，确认 ELF 与板上固件一致，再一键连接并开始采集。</li><li>变量、曲线、倍率、单位、模块与连接设置会自动保存。切换 ELF 前也会保存，硬件连接不会自动恢复。</li><li>从左侧进入电机、云台或底盘监视，在各自页面打开开关后配置绑定；默认关闭，关闭后保留绑定。</li></ol><p>采样历史与 RTT 日志保存在当前浏览器会话，刷新前请导出。可以在多个 ELF 间切换；同一时刻连接一块板。</p><p>快捷键：1 工作空间，2 数据曲线。仅访问本机 OpenOCD，不暂停、复位、烧录或调用目标函数。</p></div></dialog>
+</body></html>
