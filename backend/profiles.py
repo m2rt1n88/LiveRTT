@@ -17,6 +17,7 @@ MODULE_FIELDS = {
     "chassis": ("vx", "vy", "omega", "heading", "vxTarget", "vyTarget", "omegaTarget", "enabled"),
     "motors": ("angle", "speed", "current", "temperature"),
     "vehicle": ("headingTarget",),
+    "communications": (),
 }
 
 def text(value, name, limit=1024):
@@ -127,6 +128,12 @@ def validate_profile(body):
         if any(value and value not in paths for value in bindings.values()):
             raise DebugError("模块只能绑定当前已选变量。")
         cleaned_modules[name] = {"enabled": item.get("enabled", False) is True, "bindings": bindings}
+        if name == "communications":
+            direction = item.get("direction", "all")
+            if direction not in ("all", "RX", "TX"):
+                raise DebugError("通信方向筛选无效。")
+            cleaned_modules[name].update(selected=text(item.get("selected", ""), "通信链路", 512),
+                                         direction=direction, filter=text(item.get("filter", ""), "通信筛选", 100))
         if name in ("gimbal", "chassis"):
             cleaned_modules[name].update(settings)
         if name == "vehicle":

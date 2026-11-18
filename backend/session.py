@@ -5,6 +5,7 @@ from pathlib import Path
 from .elf_index import ElfIndex
 from .errors import DebugError
 from .motors import MotorMonitor
+from .communications import CommunicationMonitor
 from .motor_control import write_motor, set_motor_enabled
 from .probe import OpenOCD, OpenOCDService, RttReader
 
@@ -18,6 +19,7 @@ class DebugSession:
         self.service = OpenOCDService(self.firmware_root)
         self.verified_sha = None
         self.motors = None
+        self.communications = None
 
     def disconnect(self):
         self.rtt.close()
@@ -44,6 +46,7 @@ class DebugSession:
         self.disconnect()
         self.index = candidate
         self.motors = MotorMonitor(candidate)
+        self.communications = CommunicationMonitor(candidate)
         self.verified_sha = None
         return {"path": str(candidate.path), "sha": candidate.sha, "variables": len(candidate.variables), "presets": self.presets()}
 
@@ -72,14 +75,21 @@ class DebugSession:
         live = self.probe.sock is not None and self.verified_sha == index.sha
         return self.motors.scan(self.probe.read if live else None)
 
-    def sample(self, paths, sha, motor_paths=None):
+    def scan_communications(self, sha):
+        index = self.require_elf(sha)
+        if self.communications is None:
+            self.communications = CommunicationMonitor(index)
+        live = self.probe.sock is not None and self.verified_sha == index.sha
+        return self.communications.scan(self.probe.read if live else None)
+
+    def sample(self, paths, sha, motor_paths=None, communication=None):
         index = self.require_elf(sha)
         if self.probe.sock is None:
             raise DebugError("尚未连接 OpenOCD。")
         if self.verified_sha != index.sha:
             raise DebugError("请先连接 OpenOCD 并通过代码抽查。")
         motor_paths = [] if motor_paths is None else motor_paths
-        if not isinstance(paths, list) or len(paths) > 16 or any(not isinstance(p, str) for p in paths) or (not paths and not motor_paths):
+        if not isinstance(paths, list) or len(paths) > 16 or any(not isinstance(p, str) for p in paths) or (not paths and not motor_paths and not communication):
             raise DebugError("每次请选择 1～16 个数值字段。")
         start = time.perf_counter()
         cache = {}
@@ -105,8 +115,11 @@ class DebugSession:
         if motor_paths and self.motors is None:
             raise DebugError("请先扫描电机。")
         motors = self.motors.sample(motor_paths, self.probe.read) if self.motors else []
+        if communication and self.communications is None:
+            raise DebugError("请先扫描通信链路。")
+        link = self.communications.sample(communication, self.probe.read) if communication else None
         return {"time": time.time(), "durationMs": round((time.perf_counter() - start) * 1000, 2),
-                "values": values, "motors": motors, "connected": self.probe.sock is not None}
+                "values": values, "motors": motors, "communication": link, "connected": self.probe.sock is not None}
 
     def write_motor(self, body):
         index = self.require_elf(body.get("sha", ""))

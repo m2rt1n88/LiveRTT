@@ -1,5 +1,13 @@
 # 测试
 
+## 2026-11-16 通信链路监视
+
+- 全量 71 项 Python 测试通过，随后新增的旧固件快照及载荷长度错误回归也通过（合计 73 项）；68 项 Node 测试通过。通信部分包含真实 ARM DWARF／假 RAM 的旧 CAN Bridge、旧裁判、2026／2027 裁判布局测试，以及选择、游标隔离、筛选、暂停和错误状态的页面逻辑测试。
+- TypeC can_bridge host、referee 两个例程编译链接成功；没有烧录或操作真实板子。Martin/referee 赛季代码在 tests/.runtime 中编译为布局测试 ELF，外部 BSP 调用为占位符，此测试产物不能运行。
+- 生产页面使用独立合成服务完成加载配置、连接测试替身、无普通变量独立采集、链路切换、RX 筛选与暂停历史标识验证。正式 data 配置未写入测试数据。
+- 首次运行赛季适配测试前执行 python tests/build_communication_fixtures.py；需要本地 Martin/referee 分支及现有 TypeC compile_commands.json。详情见 docs/communication-monitor.md。
+- 独立新版 chassis_can_bridge.cpp 的用户指定目录在当前机器不存在，本地及远端 M2rt1n/Seer 未包含该文件；此实现的专用适配待源码。
+
 ## 2026-11-15 CAN 电机监视验证
 
 - 最终全量 30 项 Python 测试、7 项 Node 测试通过，无跳过；前端模块语法检查通过。

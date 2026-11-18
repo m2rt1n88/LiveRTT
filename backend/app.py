@@ -62,7 +62,7 @@ class Handler(SimpleHTTPRequestHandler):
             # Serve only the debugger's public assets, never ELF files, sources, .venv or directory listings.
             allowed = {"/", "/index.html", "/assets/css/app.css", "/assets/js/app.js",
                        "/assets/js/api.js", "/assets/js/charts.js", "/assets/js/profiles.js", "/assets/js/motors.js", "/assets/js/motion.js", "/assets/js/vehicle.js",
-                       "/assets/js/mechanisms.js", "/assets/js/mechanism-view.js", "/assets/js/motor-control.js", "/assets/js/motor-ai.js", "/assets/js/motor-plots.js", "/assets/models/library.json"}
+                       "/assets/js/mechanisms.js", "/assets/js/mechanism-view.js", "/assets/js/motor-control.js", "/assets/js/motor-ai.js", "/assets/js/motor-plots.js", "/assets/js/communications.js", "/assets/models/library.json"}
             if url.path not in allowed:
                 self.send_error(404)
                 return
@@ -147,7 +147,9 @@ class Handler(SimpleHTTPRequestHandler):
                     session.disconnect()
                     return self.json_response({"connected": False})
                 if path == "/api/sample":
-                    return self.json_response(session.sample(body.get("paths"), body.get("sha", ""), body.get("motorPaths")))
+                    return self.json_response(session.sample(body.get("paths"), body.get("sha", ""), body.get("motorPaths"), body.get("communication")))
+                if path == "/api/communications/scan":
+                    return self.json_response(session.scan_communications(body.get("sha", "")))
                 if path == "/api/motors/scan":
                     return self.json_response(session.scan_motors(body.get("sha", "")))
                 if path == "/api/motors/write":

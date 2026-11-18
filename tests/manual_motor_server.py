@@ -20,8 +20,8 @@ class MotorFixture(MotionFixture):
         self.values = {}
         self.writes = []
 
-    def sample(self, paths, sha, motor_paths=None):
-        sample = super().sample(paths, sha, motor_paths)
+    def sample(self, paths, sha, motor_paths=None, communication=None):
+        sample = super().sample(paths, sha, motor_paths, communication)
         for i, motor in enumerate(sample['motors']):
             fields = motor['fields']
             for ring in ('omega_pid_', 'theta_pid_'):

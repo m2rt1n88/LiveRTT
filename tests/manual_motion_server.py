@@ -48,7 +48,7 @@ class MotionFixture(DebugSession):
         self.require_elf(sha)
         return {"items": self.catalog, "live": False, "note": "合成数据，非实车。仅供图形回归。"}
 
-    def sample(self, paths, sha, motor_paths=None):
+    def sample(self, paths, sha, motor_paths=None, communication=None):
         self.require_elf(sha)
         if paths:
             raise DebugError("此替身仅提供电机测试数据，不读取真实变量。")

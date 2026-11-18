@@ -3,7 +3,8 @@ export const moduleDefinitions = {
   motors: {name: '电机监视', icon: '◉', fields: {angle: '角度', speed: '速度', current: '电流', temperature: '温度'}},
   gimbal: {name: '云台监视', icon: '◎', fields: {yaw: 'Yaw 反馈角度', yawTarget: 'Yaw 目标角度', pitch: 'Pitch 反馈角度', pitchTarget: 'Pitch 目标角度', yawSpeed: 'Yaw 反馈角速度', pitchSpeed: 'Pitch 反馈角速度', enabled: '云台使能', mode: '控制模式（原始枚举）'}},
   chassis: {name: '底盘监视', icon: '▧', fields: {vx: '实测右向速度 vx', vy: '实测前向速度 vy', omega: '实测顺时针角速度 vt', heading: '实测航向角（逆时针为正）', vxTarget: '右向指令 vx', vyTarget: '前向指令 vy', omegaTarget: '顺时针指令 vt', enabled: '底盘使能'}},
-  vehicle: {name: '整车状态', icon: '◇', fields: {headingTarget: '底盘目标航向（可选）'}}
+  vehicle: {name: '整车状态', icon: '◇', fields: {headingTarget: '底盘目标航向（可选）'}},
+  communications: {name: '通信链路监视', icon: '⇄', fields: {}}
 };
 
 export function emptyModules() {
@@ -12,6 +13,7 @@ export function emptyModules() {
   Object.assign(modules.gimbal,{angleUnit:'rad',yawWrap:true,tolerance:3,axes:{yaw:axis(),pitch:{...axis(),min:-30,max:30}}});
   Object.assign(modules.chassis,{angleUnit:'rad',layout:'mecanum',radius:.076,halfLength:.2,halfWidth:.2,vectorScale:2,offset:0,commandUnits:'si',wheels:Object.fromEntries(['fl','fr','bl','br'].map(key=>[key,{motor:'',sign:1,ratio:1}]))});
   Object.assign(modules.vehicle,{angleUnit:'rad',gimbalFrame:'body'});
+  Object.assign(modules.communications,{selected:'',direction:'all',filter:''});
   ensureSlots(modules.gimbal,'gimbal');
   return modules;
 }

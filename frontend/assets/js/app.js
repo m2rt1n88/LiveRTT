@@ -4,6 +4,7 @@ import {ProfilePersistence, emptyModules, normalizeModules, moduleDefinitions, n
 import {MotorDashboard} from './motors.js';
 import {MotionDashboard} from './motion.js';
 import {bindingFields} from './mechanisms.js';
+import {CommunicationDashboard} from './communications.js';
 
 const $ = id => document.getElementById(id);
 const api = createApi();
@@ -16,8 +17,10 @@ const notify = (text, error=false) => { $('notice').textContent=text; $('notice'
 const saveError = error => { $('save-status').textContent='保存失败 · 请重试'; $('save-status').className='error'; notify(error.message,true); };
 const motors = new MotorDashboard($('motor-dashboard'),state,{scan:()=>action(scanMotors),write:body=>api.request('motors/write',body),enable:body=>api.request('motors/enable',body),changed,controls,error:message=>notify(message,true)});
 const motion = new MotionDashboard($('motion-dashboard'),state,motors,{scan:()=>action(scanMotors),changed,controls,reconfigure:()=>renderModules(),error:message=>notify(message,true)});
+const communications = new CommunicationDashboard($('communication-dashboard'),state,{scan:()=>action(scanCommunications),changed,controls});
+async function scanCommunications(){if(!state.sha)throw Error('请先加载 ELF。');communications.setCatalog(await api.request('communications/scan',{sha:state.sha}));}
 const motorPaths=()=>[...new Set([...motors.paths(),...motion.paths()])];
-const monitorActive=()=>Object.values(state.modules).some(m=>m.enabled);
+const monitorActive=()=>['motors','gimbal','chassis','vehicle'].some(key=>state.modules[key].enabled);
 async function scanMotors(){if(!state.sha)throw Error('请先加载 ELF。');motors.setCatalog(await api.request('motors/scan',{sha:state.sha}));if(['gimbal','chassis','vehicle'].includes(state.page)&&state.modules[state.page].enabled)motion.configure(state.page);}
 const persistence = new ProfilePersistence(api, () => state.sha ? snapshotProfile(state, connection()) : null, (profile, latest) => {
   if (normalizePath(profile.elfPath) !== normalizePath(state.elfPath)) return;
@@ -41,7 +44,7 @@ function applyConnection(value={}) {
   $('tcl-port').value=value.port??6666; $('rtt-port').value=value.rttPort??8888;
 }
 function controls() {
-  const usable=state.watches.some(w=>w.valid)||motorPaths().length>0;
+  const usable=state.watches.some(w=>w.valid)||motorPaths().length>0||Boolean(communications.request());
   $('load-elf').disabled=!state.ready||state.busy;
   $('profile-select').disabled=!state.ready||state.busy;
   $('connect').disabled=!state.sha||!$('firmware-confirm').checked||state.busy;
@@ -62,6 +65,7 @@ function controls() {
   for (const input of document.querySelectorAll('#watch-table input, #curve-channels input, #monitor-settings input, #monitor-settings select, #monitor-settings button, #monitor-enabled')) input.disabled=state.busy||!state.sha;
   for (const input of document.querySelectorAll('#motor-dashboard input, #motor-dashboard select, #motor-dashboard button')) input.disabled=state.busy||!state.sha;
   motors.refreshControls();
+  for (const input of document.querySelectorAll('#communication-dashboard input, #communication-dashboard select, #communication-dashboard button')) input.disabled=state.busy||!state.sha;
   for (const input of document.querySelectorAll('#motion-dashboard input, #motion-dashboard select, #motion-dashboard button, #motion-dashboard textarea')) input.disabled=state.busy||!state.sha;
   for (const id of ['openocd-executable','openocd-config','tcl-port','rtt-port','auto-start','elf-path','firmware-confirm','sample-rate','chart-window','plot-all']) $(id).disabled=state.busy;
 }
@@ -99,7 +103,7 @@ async function loadElf(path, requestedProfile=null, imported=false) {
     if(existing)profile=await api.request('profile?'+new URLSearchParams({id:existing.id}));
   }
   const previous=histories.get(normalizePath(info.path));
-  motors.reset();motion.reset();
+  motors.reset();motion.reset();communications.reset();
   Object.assign(state,{sha:info.sha,elfPath:info.path,profileId:imported?'':profile?.id||'',profileName:profile?.name||info.path.split(/[\\/]/).pop().replace(/\.elf$/i,''),
     watches:[],rows:previous?.sha===info.sha?previous.rows:[],rttLines:previous?.sha===info.sha?previous.rttLines:[],rttCursor:0,
     rate:profile?.rate||10,window:profile?.window||'30',modules:normalizeModules(profile?.modules)});
@@ -116,6 +120,7 @@ async function loadElf(path, requestedProfile=null, imported=false) {
   }
   renderAll(); await searchVariables();
   if(monitorActive())await scanMotors();
+  if(state.modules.communications.enabled)await scanCommunications();
   changed(); await persistence.flush();
   notify('已加载 '+state.profileName+'。'+(profile?'已恢复 '+state.watches.length+' 个变量及对应曲线 / 模块配置。':'从变量浏览器添加需要观察的字段即可开始。')+(missing?' '+missing+' 个变量已失效，配置仍保留，请修改或移除。':''),missing>0);
 }
@@ -184,7 +189,7 @@ function renderWatches() {
     const plotCell=el('td'),plot=el('input');plot.type='checkbox';plot.checked=watch.plot;plot.setAttribute('aria-label','绘制 '+watch.path);
     plot.addEventListener('change',()=>{watch.plot=plot.checked;renderCurves();changed();});watch.plotNode=plot;plotCell.append(plot);
     const actions=el('td'),remove=el('button','text-button','移除'); remove.setAttribute('aria-label','移除 '+watch.path);
-    remove.addEventListener('click',()=>{if(state.busy)return;state.watches=state.watches.filter(w=>w!==watch);for(const config of Object.values(state.modules))for(const field of Object.keys(config.bindings))if(config.bindings[field]===watch.path)config.bindings[field]='';motion.reset();if(!state.watches.some(w=>w.valid)&&!motorPaths().length)stop();renderAll();changed();});
+    remove.addEventListener('click',()=>{if(state.busy)return;state.watches=state.watches.filter(w=>w!==watch);for(const config of Object.values(state.modules))for(const field of Object.keys(config.bindings))if(config.bindings[field]===watch.path)config.bindings[field]='';motion.reset();if(!state.watches.some(w=>w.valid)&&!motorPaths().length&&!communications.request())stop();renderAll();changed();});
     actions.append(remove);row.append(watch.statusNode,plotCell,actions);body.append(row);
   }
 }
@@ -229,6 +234,14 @@ function renderModules() {
   $('monitor-enable-label').textContent='启用'+definition.name;
   $('monitor-state').textContent=config.enabled?'已启用':'未启用';
   $('monitor-hint').textContent=!state.sha?'先在工作空间加载 ELF，再启用本模块并配置变量绑定。':config.enabled?'为当前模块绑定电机或其他数值字段。监视开关独立控制，不影响工作空间读数与曲线采集。':'本模块当前关闭。打开开关后配置绑定，关闭时保留已有设置。';
+  $('communication-dashboard').hidden=!enabled||state.page!=='communications';
+  if(state.page==='communications'){
+    $('monitor-settings').hidden=true;$('motor-dashboard').hidden=true;$('motion-dashboard').hidden=true;
+    $('monitor-disabled').hidden=enabled;
+    $('monitor-hint').textContent='选择一路通信，实时查看收发帧与解析字段。字段快照兼容未加记录的旧固件；逐帧记录需重新构建固件。';
+    $('monitor-disabled').querySelector('p').textContent='打开开关后扫描通信链路。';
+    if(enabled)communications.configure();controls();return;
+  }
   $('monitor-settings').hidden=!enabled||state.page==='motors';
   $('motor-dashboard').hidden=!enabled||state.page!=='motors';
   if(state.page==='motors')$('monitor-hint').textContent='扫描固件注册的 CAN 电机，选择后统一采集反馈、目标与输出。无需逐字段绑定；选择、重点电机与总线筛选随 ELF 保存。';
@@ -263,6 +276,7 @@ function renderNavigation() {
 function renderMonitor() {
   const definition=moduleDefinitions[state.page];if(!definition)return;
   if(state.page==='motors'){motors.render();return;}
+  if(state.page==='communications'){communications.render();return;}
   motion.render();
 }
 function navigate(page,updateHash=true) {
@@ -272,6 +286,7 @@ function navigate(page,updateHash=true) {
   const title=page==='workspace'?'从变量开始，理解你的程序。':page==='curves'?'让每一条曲线，都有来处。':moduleDefinitions[page].name;
   $('page-title').textContent=title;$('breadcrumb').textContent=page==='workspace'?'ELF 与变量':page==='curves'?'数据曲线':title;
   $('page-description').textContent=page==='workspace'?'选择 ELF，观察真实变量。每个程序都有自己的调试配置。':page==='curves'?'同一个采集会话，自由选择变量、倍率与单位。':page==='motors'?'从 CAN 反馈到控制输出，观察电机正在经历什么。':page==='gimbal'?'按所选构型联动查看各关节，悬停电机查看反馈、目标与输出。':page==='vehicle'?'把底盘与云台放在一起，对照整车姿态、目标瞄向与旋转补偿。':'按实际构型观察平移、转动与轮组响应，可编辑模板拓展。';
+  if(page==='communications')$('page-description').textContent='选择任意一路通信，对照收发帧、原始字节与当前解析字段。';
   if(updateHash&&location.hash!=='#'+page)history.replaceState(null,'','#'+page);
   if(updateHash)window.scrollTo({top:0});
   if(page==='curves')requestAnimationFrame(()=>chart.draw(state.watches,state.rows,state.window));
@@ -283,7 +298,8 @@ async function connect() {
   await persistence.flush();stop();state.connected=false;state.generation++;controls();notify('正在启动 / 复用 OpenOCD，核对 ELF 并连接 RTT…');
   const data=await api.request('connect',{sha:state.sha,...connection(),confirmed:$('firmware-confirm').checked});
   state.connected=true;state.rttConnected=!data.rttError;state.rttCursor=0;
-  motors.reset();motion.reset();if(monitorActive())await scanMotors();
+  motors.reset();motion.reset();communications.reset();if(monitorActive())await scanMotors();
+  if(state.modules.communications.enabled)await scanCommunications();
   if(state.rttLines.length)state.rttLines.push('── '+new Date().toLocaleTimeString()+' · 重新连接 ──');
   $('rtt-status').textContent=data.rttError||'RTT 已连接 · 上行通道 0';
   if(!state.rttLines.length)$('rtt-log').textContent=data.rttError||'RTT 已连接，等待固件输出日志。';
@@ -295,12 +311,14 @@ async function poll(run) {
   const paths=state.watches.filter(w=>w.valid).map(w=>w.path);
   const selectedMotors=motorPaths();
   if(selectedMotors.length>64){stop();notify('所有监视模块合计最多采集 64 个不同电机，请减少选择。',true);return;}
-  if(!paths.length&&!selectedMotors.length){stop();return;}
+  const selectedCommunication=communications.request();
+  if(!paths.length&&!selectedMotors.length&&!selectedCommunication){stop();return;}
   const started=performance.now();state.inFlight=true;
   try {
-    const data=await api.request('sample',{paths,motorPaths:selectedMotors,sha:state.sha});
+    const data=await api.request('sample',{paths,motorPaths:selectedMotors,communication:selectedCommunication,sha:state.sha});
     if(run!==state.run||!state.running)return;
     if(data.motors?.length)motors.ingest(data.motors,data.time);
+    communications.ingest(data.communication,data.time);
     const row={time:data.time,values:Object.create(null),raw:Object.create(null)};let valid=0;
     for(const result of data.values){const watch=state.watches.find(w=>w.path===result.path);if(!watch)continue;row.values[result.path]=result.value;row.raw[result.path]=result.exact??result.value;watch.value=result.value;watch.exact=result.exact;watch.error=result.error||'';if(result.value!==null){watch.lastTime=data.time;watch.address=result.address;valid++;}}
     motion.ingest(data.time);
@@ -350,9 +368,9 @@ $('variable-expression').addEventListener('keydown',event=>{if(event.key==='Ente
 $('monitor-enabled').addEventListener('change',()=>{
   if(state.busy||!state.sha||!moduleDefinitions[state.page])return;
   state.modules[state.page].enabled=$('monitor-enabled').checked;
-  if(state.page!=='motors')motion.reset(state.page,false);
+  if(!['motors','communications'].includes(state.page))motion.reset(state.page,false);
   renderNavigation();changed();
-  if(state.modules[state.page].enabled)action(scanMotors);
+  if(state.modules[state.page].enabled)action(state.page==='communications'?scanCommunications:scanMotors);
 });
 $('monitor-add-variable').addEventListener('click',()=>action(async()=>{
   if(!state.modules[state.page]?.enabled) return;
